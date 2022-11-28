@@ -27,4 +27,9 @@ class Studio extends Model
     {
         return $this->hasMany(Costumer::class, 'studio_uuid', 'uuid');
     }
+
+    public function professionals()
+    {
+        return $this->hasMany(Professional::class, 'studio_id', 'uuid');
+    }
 }

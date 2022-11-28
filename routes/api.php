@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CostumerController;
+use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\Cors;
 use Illuminate\Http\Request;
@@ -43,6 +44,13 @@ Route::controller(CostumerController::class)->group(function () {
     Route::get('costumer', 'index');
     Route::patch('costumer', 'update');
     Route::post('costumer', 'store');
+
+});
+
+Route::controller(ProfessionalController::class)->group(function () {
+    Route::get('professional', 'index');
+    Route::patch('professional', 'update');
+    Route::post('professional', 'store');
 
 });
 

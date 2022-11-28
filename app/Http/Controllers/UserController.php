@@ -131,7 +131,6 @@ class UserController extends Controller
 
     public function getLoginInfo($email)
     {
-
         $user = User::where('email', $email)->first()->toArray();
         $studio_uuid = $user['studio_uuid'];
 
