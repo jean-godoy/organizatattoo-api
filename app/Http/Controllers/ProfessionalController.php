@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ProfessionalService;
+use App\Services\UserService;
 use App\Util\JWT\GenerateToken;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,38 @@ class ProfessionalController extends Controller
      */
     public function index()
     {
-        //
+        $token= request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $response = ProfessionalService::all($user['studio_uuid']);
+
+        if($response){
+            return response()->json([
+                "status" => true,
+                "message" => "Lista de Profissionais cadastrados",
+                "data" => $response
+            ]);
+        }
     }
 
     /**

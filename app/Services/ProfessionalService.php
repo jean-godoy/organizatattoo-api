@@ -7,6 +7,14 @@ use App\Models\Studio;
 
 class ProfessionalService
 {
+
+    public static function all($studio_id)
+    {
+        $studio = Studio::where('uuid', $studio_id)->first();
+        $professional = $studio->professionals()->get();
+        return $professional->toarray();
+    }
+
     public static function register($data)
     {
 
