@@ -56,6 +56,7 @@ Route::controller(ProfessionalController::class)->group(function () {
     Route::get('professional-bank-data/{id}', 'getProfessionalBankData');
     Route::get('professional-payment/{id}', 'getProfessionalPayment');
     Route::get('professional-full-data/{id}', 'getProfessionalFullData');
+    Route::get('professional-search/{search}', 'getProfessionalSearch');
 
 });
 

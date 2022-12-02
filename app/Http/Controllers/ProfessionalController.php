@@ -185,6 +185,10 @@ class ProfessionalController extends Controller
     }
 
 
+    /**
+     * Método que retorna todos os dados referentes ao
+     * profissional pelo ID.
+     */
     public function getProfessionalFullData($id)
     {
         $token = request()->bearerToken();
@@ -192,16 +196,17 @@ class ProfessionalController extends Controller
 
         if ($permission) {
 
-            $professional = Professional::where('id', $id)->get()->toArray() ?? null;
+            $professional = Professional::where('id', $id)->first()->toArray() ?? null;
             if ($professional) {
-                $address = ProfessionalAddress::where('professional_id', $id)->get()->toArray();
-                $bank = BankData::where('professional_id', $id)->get()->toArray();
-                $payment = Payment::where('professional_id', $id)->get()->toArray();
+                $address = ProfessionalAddress::where('professional_id', $id)->first()->toArray();
+                $bank = BankData::where('professional_id', $id)->first()->toArray();
+                $payment = Payment::where('professional_id', $id)->first()->toArray();
 
                 return response()->json([
                     "status" => true,
                     "message" => "Dados completos do profissonal para edição.",
                     "data" => [
+                        "professional" => $professional,
                         "address" => $address,
                         "bank" => $bank,
                         "payment" => $payment
@@ -215,5 +220,19 @@ class ProfessionalController extends Controller
                 "data" => []
             ]);
         }
+    }
+
+    public function getProfessionalSearch($search)
+    {
+        $professional = Professional::where('name', 'LIKE', "%$search%")->get(['id', 'name'])->toArray() ?? null;
+
+        if($professional) {
+            return response()->json([
+                "status" => true,
+                "message" => "Resultado da pesquisa...",
+                "data" => $professional
+            ]);
+        }
+
     }
 }
