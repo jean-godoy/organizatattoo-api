@@ -51,6 +51,11 @@ Route::controller(ProfessionalController::class)->group(function () {
     Route::get('professional', 'index');
     Route::patch('professional', 'update');
     Route::post('professional', 'store');
+    Route::get('professional-data/{id}', 'getProfessionalData');
+    Route::get('professional-address/{id}', 'getProfessionalAddress');
+    Route::get('professional-bank-data/{id}', 'getProfessionalBankData');
+    Route::get('professional-payment/{id}', 'getProfessionalPayment');
+    Route::get('professional-full-data/{id}', 'getProfessionalFullData');
 
 });
 

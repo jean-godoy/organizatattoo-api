@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankData;
+use App\Models\Payment;
+use App\Models\Professional;
+use App\Models\ProfessionalAddress;
 use App\Services\ProfessionalService;
 use App\Services\UserService;
 use App\Util\JWT\GenerateToken;
+use App\Util\JWT\TokenValidate;
 use Illuminate\Http\Request;
 
 class ProfessionalController extends Controller
@@ -16,7 +21,7 @@ class ProfessionalController extends Controller
      */
     public function index()
     {
-        $token= request()->bearerToken();
+        $token = request()->bearerToken();
 
         $is_valid = GenerateToken::checkAuth($token);
 
@@ -41,7 +46,7 @@ class ProfessionalController extends Controller
 
         $response = ProfessionalService::all($user['studio_uuid']);
 
-        if($response){
+        if ($response) {
             return response()->json([
                 "status" => true,
                 "message" => "Lista de Profissionais cadastrados",
@@ -58,7 +63,7 @@ class ProfessionalController extends Controller
      */
     public function store(Request $request)
     {
-        $token= request()->bearerToken();
+        $token = request()->bearerToken();
 
         $is_valid = GenerateToken::checkAuth($token);
 
@@ -106,7 +111,7 @@ class ProfessionalController extends Controller
 
         $res = ProfessionalService::register($fieldset);
 
-        if($res) {
+        if ($res) {
             return response()->json([
                 "status" => true,
                 "message" => "Profissional cadastrado com sucesso",
@@ -153,5 +158,62 @@ class ProfessionalController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getProfessionalData($id)
+    {
+    }
+
+    public function getProfessionalAddress($id)
+    {
+        $token = request()->bearerToken();
+
+        $permission = TokenValidate::chekAndValidateToken($token);
+
+        if ($permission) {
+            $address = ProfessionalAddress::where('professional_id', $id)->get();
+            dd($address->toArray());
+        }
+    }
+
+    public function getProfessionalBankData($id)
+    {
+    }
+
+    public function getProfessionalPayment($id)
+    {
+    }
+
+
+    public function getProfessionalFullData($id)
+    {
+        $token = request()->bearerToken();
+        $permission = TokenValidate::chekAndValidateToken($token);
+
+        if ($permission) {
+
+            $professional = Professional::where('id', $id)->get()->toArray() ?? null;
+            if ($professional) {
+                $address = ProfessionalAddress::where('professional_id', $id)->get()->toArray();
+                $bank = BankData::where('professional_id', $id)->get()->toArray();
+                $payment = Payment::where('professional_id', $id)->get()->toArray();
+
+                return response()->json([
+                    "status" => true,
+                    "message" => "Dados completos do profissonal para edição.",
+                    "data" => [
+                        "address" => $address,
+                        "bank" => $bank,
+                        "payment" => $payment
+                    ]
+                ]);
+            }
+
+            return response()->json([
+                "status" => false,
+                "message" => "Nenhum profissional encontrado.",
+                "data" => []
+            ]);
+        }
     }
 }
