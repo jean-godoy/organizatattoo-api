@@ -32,4 +32,9 @@ class Studio extends Model
     {
         return $this->hasMany(Professional::class, 'studio_id', 'uuid');
     }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class, 'studio_id', 'uuid');
+    }
 }

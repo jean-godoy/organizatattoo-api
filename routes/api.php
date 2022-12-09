@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CostumerController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\UserController;
@@ -44,6 +46,7 @@ Route::controller(CostumerController::class)->group(function () {
     Route::get('costumer', 'index');
     Route::patch('costumer', 'update');
     Route::post('costumer', 'store');
+    Route::get('costumer-search/{search}', 'getCostumerSearch');
 
 });
 
@@ -58,6 +61,19 @@ Route::controller(ProfessionalController::class)->group(function () {
     Route::get('professional-full-data/{id}', 'getProfessionalFullData');
     Route::get('professional-search/{search}', 'getProfessionalSearch');
 
+});
+
+Route::controller(CategoryController::class)->group(function () {
+    Route::get('category', 'index');
+    Route::get('check-category/{category}', 'checkCategory');
+    Route::post('category', 'store');
+    Route::post('sub-category', 'storeSubCategory');
+    Route::get('sub-category/{id}', 'getSubCategory');
+});
+
+Route::controller(BudgetController::class)->group(function () {
+    Route::post('budget', 'store');
+    Route::get('budget', 'index');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);

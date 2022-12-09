@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\BudgetService;
+use App\Services\UserService;
+use App\Util\JWT\GenerateToken;
+use Illuminate\Http\Request;
+
+class BudgetController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+        dd($user['studio_uuid']);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $fieldset = $request->validate([
+            // 'user_id' => 'required|string',
+            'studio_id' => 'required|string',
+            'costumer_id' => 'required|string',
+            'costumer_name' => 'required|string',
+            'professional_id' => 'required|string',
+            'professional_name' => 'required|string',
+            'type_service' => 'required|string',
+            'style_service' => 'required|string',
+            'body_region' => 'required|string',
+            'project_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'sessions' => 'required|string',
+            'width' => 'numeric',
+            'heigth' => 'numeric',
+            'price' => 'required|string',
+            'validated_at' => 'required|string',
+            'note' => 'required|string',
+        ]);
+
+        $imageName = null;
+        //Verifica se existe a imagem.
+        if (array_key_exists('project_image', $fieldset)) {
+            $imageName = time() . '.' . $fieldset['project_image']->extension();
+            $fieldset['project_image']->move(public_path('images/budget'), $imageName);
+        }
+
+        $response = BudgetService::registerBudget($fieldset, $user['uuid'], $imageName);
+
+        if ($response) {
+            return response()->json([
+                "status" => true,
+                "message" => "Orçamento criado com sucesso.",
+                "data" => $response
+            ]);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}

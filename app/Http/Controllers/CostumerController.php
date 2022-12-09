@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Costumer;
 use App\Models\Studio;
 use App\Services\CostumerService;
 use App\Services\StudioService;
@@ -168,5 +169,18 @@ class CostumerController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getCostumerSearch($search)
+    {
+        $costumers = Costumer::where('name', 'LIKE', "%$search%")->get(['uuid', 'name'])->toArray() ?? null;
+
+        if($costumers) {
+            return response()->json([
+                "status" => true,
+                "message" => "Resultado da pesquisa...",
+                "data" => $costumers
+            ]);
+        }
     }
 }
