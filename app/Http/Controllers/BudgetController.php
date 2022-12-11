@@ -6,6 +6,7 @@ use App\Services\BudgetService;
 use App\Services\UserService;
 use App\Util\JWT\GenerateToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BudgetController extends Controller
 {
@@ -38,7 +39,23 @@ class BudgetController extends Controller
 
         $email = UserService::getUserEmailByToken($token);
         $user = UserService::getUserDataByEmail($email);
-        dd($user['studio_uuid']);
+
+        $response = BudgetService::getBudgetByStudioId($user['studio_uuid']);
+
+        if($response) {
+            return response()->json([
+                "status" => true,
+                "message" => "Lista de agendamentos",
+                "data" => $response
+            ]);
+        }
+
+        return response()->json([
+            "status" => false,
+            "message" => "Ocorreu algum erro ao buscar agendamentos",
+            "data" => []
+        ]);
+
     }
 
     /**
@@ -95,9 +112,13 @@ class BudgetController extends Controller
         //Verifica se existe a imagem.
         if (array_key_exists('project_image', $fieldset)) {
             $imageName = time() . '.' . $fieldset['project_image']->extension();
-            $fieldset['project_image']->move(public_path('images/budget'), $imageName);
+            // $fieldset['project_image']->move(public_path('images/budget'), $imageName);
+            $upload = $request->project_image->storeAs('public/budgets', $imageName);
         }
 
+        $i = Storage::url('budgets/1670630935.png');
+
+        // dd($i);
         $response = BudgetService::registerBudget($fieldset, $user['uuid'], $imageName);
 
         if ($response) {
@@ -141,5 +162,10 @@ class BudgetController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getImage()
+    {
+        return Storage::url('budgets/1670718780.jpg');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Budget;
+use App\Models\Studio;
 
 class BudgetService
 {
@@ -30,8 +31,23 @@ class BudgetService
                 'url_image' => $url_image
             ]);
 
+            if($budget) {
+                return $budget;
+            }
+
         } catch (\Throwable $th) {
             dd($th);
         }
+    }
+
+    public static function getBudgetByStudioId($studio_uuid)
+    {
+        $studio = Budget::where('studio_id', $studio_uuid)->get() ?? null;
+        return $studio->toArray();
+        if(!$studio) {
+            return false;
+        }
+
+        return $studio->budgets->toArray();
     }
 }

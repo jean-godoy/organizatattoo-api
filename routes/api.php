@@ -74,6 +74,7 @@ Route::controller(CategoryController::class)->group(function () {
 Route::controller(BudgetController::class)->group(function () {
     Route::post('budget', 'store');
     Route::get('budget', 'index');
+    Route::get('budget-image', 'getImage');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);
