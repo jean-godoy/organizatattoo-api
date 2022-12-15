@@ -15,6 +15,7 @@ class Budget extends Model
         'id',
         'user_id',
         'studio_id',
+        'name',
         'costumer_id',
         'costumer_name',
         'professional_id',

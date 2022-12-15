@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Budget;
 use App\Services\BudgetService;
 use App\Services\UserService;
 use App\Util\JWT\GenerateToken;
@@ -93,6 +94,7 @@ class BudgetController extends Controller
             // 'user_id' => 'required|string',
             'studio_id' => 'required|string',
             'costumer_id' => 'required|string',
+            'name' => 'required|string',
             'costumer_name' => 'required|string',
             'professional_id' => 'required|string',
             'professional_name' => 'required|string',
@@ -114,6 +116,7 @@ class BudgetController extends Controller
             $imageName = time() . '.' . $fieldset['project_image']->extension();
             // $fieldset['project_image']->move(public_path('images/budget'), $imageName);
             $upload = $request->project_image->storeAs('public/budgets', $imageName);
+            $imageName = "/storage/budgets/$imageName";
         }
 
         $i = Storage::url('budgets/1670630935.png');
@@ -167,5 +170,51 @@ class BudgetController extends Controller
     public function getImage()
     {
         return Storage::url('budgets/1670718780.jpg');
+    }
+
+    public function search($costumer)
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $response = BudgetService::searchBudget($user['studio_uuid'], $costumer);
+
+        if($response) {
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "message" => "Resultado da busca",
+                "data" => $response
+            ]);
+        }
+
+        if(!$response) {
+            return response()->json([
+                "status" => false,
+                "code" => 400,
+                "message" => "Ocoreu algum erro durante a busca.",
+                "data" => []
+            ]);
+        }
     }
 }

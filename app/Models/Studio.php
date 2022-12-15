@@ -39,6 +39,6 @@ class Studio extends Model
     }
     public function budgets()
     {
-        return $this->hasMany(Budget::class, 'studio_uuid', 'id');
+        return $this->hasMany(Budget::class, 'studio_id', 'uuid');
     }
 }

@@ -14,6 +14,7 @@ class BudgetService
             $budget = Budget::create([
                 'id' => md5(uniqid(rand() . "", true)),
                 'user_id' => $user_id,
+                'name' => $fieldset['name'],
                 'studio_id' => $fieldset['studio_id'],
                 'costumer_id' => $fieldset['costumer_id'],
                 'costumer_name' => $fieldset['costumer_name'],
@@ -31,10 +32,9 @@ class BudgetService
                 'url_image' => $url_image
             ]);
 
-            if($budget) {
+            if ($budget) {
                 return $budget;
             }
-
         } catch (\Throwable $th) {
             dd($th);
         }
@@ -42,12 +42,25 @@ class BudgetService
 
     public static function getBudgetByStudioId($studio_uuid)
     {
-        $studio = Budget::where('studio_id', $studio_uuid)->get() ?? null;
+        $studio = Budget::where('studio_id', $studio_uuid)->orderBy('created_at', 'DESC') ?? null;
         return $studio->toArray();
-        if(!$studio) {
+        if (!$studio) {
             return false;
         }
 
         return $studio->budgets->toArray();
+    }
+
+    public static function searchBudget($studio_uuid, $costumer_name)
+    {
+        try {
+            $budget = Budget::where('studio_id', $studio_uuid)
+                ->where('costumer_name', 'LIKE', "%$costumer_name%")
+                ->get()
+                ->toArray() ?? null;
+            return $budget;
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 }

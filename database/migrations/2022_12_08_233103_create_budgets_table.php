@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->uuid('id');
+            $table->string('name');
             $table->uuid('user_id');
             $table->uuid('studio_id');
             $table->uuid('costumer_id');
