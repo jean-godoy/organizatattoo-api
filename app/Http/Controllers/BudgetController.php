@@ -42,8 +42,8 @@ class BudgetController extends Controller
         $user = UserService::getUserDataByEmail($email);
 
         $response = BudgetService::getBudgetByStudioId($user['studio_uuid']);
-
-        if($response) {
+        // dd($response['status']);
+        if($response['status']) {
             return response()->json([
                 "status" => true,
                 "message" => "Lista de agendamentos",
