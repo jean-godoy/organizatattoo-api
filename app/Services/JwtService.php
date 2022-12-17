@@ -13,6 +13,7 @@ class JwtService
         if(!$user) {
             return [
                 "status" => false,
+                "code" => 401,
                 "message" => "E-mail oui senha incorretos, Por favor tente novamente.",
                 "data" => null
             ];
@@ -23,6 +24,7 @@ class JwtService
         if(!$password) {
             return [
                 "status" => false,
+                "code" => 401,
                 "message" => "E-mail oui senha incorretos, Por favor tente novamente..",
                 "data" => null
             ];
@@ -31,6 +33,7 @@ class JwtService
         $data = $user->toArray();
         return [
             "status" => true,
+            "code" => 200,
             "message" => "Usuário logado com sucesso.",
             "data" => $data
         ];

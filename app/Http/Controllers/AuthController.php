@@ -70,6 +70,7 @@ class AuthController extends Controller
         ]);
 
         $response = GenerateToken::login($fielsd['email'], $fielsd['password']);
+
         return $response;
     }
 

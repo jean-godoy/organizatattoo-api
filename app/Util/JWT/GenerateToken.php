@@ -24,6 +24,7 @@ class GenerateToken
         if(!$user['status']) {
             return [
                 "status" => false,
+                "code" => $user['code'],
                 "message" => $user['message'],
                 "data" => null
             ];
@@ -67,6 +68,7 @@ class GenerateToken
             // dd($user)
             $response = [
                 "status" => true,
+                "code" => $user['code'],
                 "message" => $user['message'],
                 "data" => [
                     "studio" => $data,

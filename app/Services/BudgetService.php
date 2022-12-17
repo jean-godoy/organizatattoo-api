@@ -42,7 +42,9 @@ class BudgetService
 
     public static function getBudgetByStudioId($studio_uuid)
     {
-        $studio = Budget::where('studio_id', $studio_uuid)->orderBy('created_at', 'DESC') ?? null;
+
+        $studio = Budget::where('studio_id', $studio_uuid)->orderBy('created_at', 'DESC')->get() ?? null;
+        // dd($studio);
         return $studio->toArray();
         if (!$studio) {
             return false;
