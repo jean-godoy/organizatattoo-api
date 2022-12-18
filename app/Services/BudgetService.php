@@ -68,4 +68,18 @@ class BudgetService
             //throw $th;
         }
     }
+
+    /**
+     * Serviço que deleta um orçamento pelo ID
+     */
+    public static function destroyBudget($studio_uuid, $budget_id)
+    {
+        try {
+            $studio = Studio::where('uuid', $studio_uuid)->first();
+            $budget = $studio->budgets()->where('id', $budget_id)->first();
+            return $budget->delete();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
 }

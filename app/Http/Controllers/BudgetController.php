@@ -43,7 +43,7 @@ class BudgetController extends Controller
 
         $response = BudgetService::getBudgetByStudioId($user['studio_uuid']);
         // dd($response['status']);
-        if($response['status']) {
+        if ($response['status']) {
             return response()->json([
                 "status" => true,
                 "message" => "Lista de agendamentos",
@@ -56,7 +56,6 @@ class BudgetController extends Controller
             "message" => "Ocorreu algum erro ao buscar agendamentos",
             "data" => []
         ]);
-
     }
 
     /**
@@ -164,7 +163,46 @@ class BudgetController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $response = BudgetService::destroyBudget($user['studio_uuid'], $id);
+
+        if ($response) {
+            return response()->json([
+                "status" => true,
+                "code" => 204,
+                "message" => "Orçamento deleteado com sucesso.",
+                "data" => []
+            ]);
+
+            return response()->json([
+                "status" => false,
+                "code" => 501,
+                "message" => "Ocorreu algum erro ao deletar orçamento.",
+                "data" => []
+            ]);
+        }
     }
 
     public function getImage()
@@ -199,7 +237,7 @@ class BudgetController extends Controller
 
         $response = BudgetService::searchBudget($user['studio_uuid'], $costumer);
 
-        if($response) {
+        if ($response) {
             return response()->json([
                 "status" => true,
                 "code" => 200,
@@ -208,7 +246,7 @@ class BudgetController extends Controller
             ]);
         }
 
-        if(!$response) {
+        if (!$response) {
             return response()->json([
                 "status" => false,
                 "code" => 400,
