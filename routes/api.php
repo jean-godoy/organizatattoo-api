@@ -83,6 +83,8 @@ Route::controller(BudgetController::class)->group(function () {
 Route::controller(MaterialController::class)->group(function () {
     Route::get('material-products', 'getAllProducts');
     Route::post('material', 'addProduct');
+    Route::get('get-brand-by-product-id/{id}', 'getBrandByProductId');
+    Route::post('material-brand', 'addBrand');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);

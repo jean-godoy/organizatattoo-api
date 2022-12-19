@@ -13,7 +13,7 @@ class MaterialBrand extends Model
 
     protected $fillable = [
         'id',
-        'product_name',
+        'product_brand',
         'material_product_id'
     ];
 
