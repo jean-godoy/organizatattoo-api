@@ -34,7 +34,7 @@ class MaterialController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function addProduct(Request $request)
     {
         $token = request()->bearerToken();
 
@@ -67,7 +67,7 @@ class MaterialController extends Controller
 
         if($check_product) {
             return response()->json([
-                "status" => true,
+                "status" => false,
                 "code" => 200,
                 "replicated" => true,
                 "message" => "Produto {$fieldset['product_name']} já cadastrado",
@@ -88,6 +88,50 @@ class MaterialController extends Controller
 
     }
 
+    public function  getAllProducts()
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $reponse = MaterialService::getAllProducts($user['studio_uuid']);
+
+        if($reponse) {
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "message" => "Lista de productos cadastrados.",
+                "data" => $reponse
+            ]);
+        }
+
+        return response()->json([
+            "status" => false,
+            "code" => 202,
+            "message" => "Nenhum produto cadastrado.",
+            "data" => []
+        ]);
+    }
+
     /**
      * Display the specified resource.
      *
@@ -96,7 +140,7 @@ class MaterialController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**

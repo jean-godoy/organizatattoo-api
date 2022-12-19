@@ -14,10 +14,16 @@ class MaterialService
     {
         try {
             $studio = Studio::where('uuid', $studio_uuid)->first();
-            $response = $studio->materialProducts->where('product_name', $product)->first()->toArray() ?? null;
-            return $response;
+            $response = $studio->materialProducts->where('product_name', $product)->first() ?? null;
+
+            if($response) {
+                return $response->product_name;
+            }
+
+            return null;
+
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
     }
 
@@ -30,6 +36,17 @@ class MaterialService
                 'product_name' => $product
             ]);
             return $response;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function getAllProducts($studio_uuid)
+    {
+        try {
+            $studio = Studio::where('uuid', $studio_uuid)->first();
+            $products = $studio->materialProducts()->get(['id', 'product_name'])->toArray() ?? null;
+            return $products;
         } catch (\Throwable $th) {
             throw $th;
         }

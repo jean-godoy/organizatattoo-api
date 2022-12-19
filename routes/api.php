@@ -81,7 +81,8 @@ Route::controller(BudgetController::class)->group(function () {
 });
 
 Route::controller(MaterialController::class)->group(function () {
-    Route::post('material', 'store');
+    Route::get('material-products', 'getAllProducts');
+    Route::post('material', 'addProduct');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);
