@@ -37,8 +37,14 @@ class Studio extends Model
     {
         return $this->hasMany(Category::class, 'studio_id', 'uuid');
     }
+
     public function budgets()
     {
         return $this->hasMany(Budget::class, 'studio_id', 'uuid');
+    }
+
+    public function materialProducts()
+    {
+        return $this->hasMany(MaterialProduct::class, 'studio_id', 'uuid');
     }
 }

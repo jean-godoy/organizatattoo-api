@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MaterialService;
 use App\Services\UserService;
 use App\Util\JWT\GenerateToken;
 use Illuminate\Http\Request;
@@ -57,7 +58,34 @@ class MaterialController extends Controller
 
         $email = UserService::getUserEmailByToken($token);
         $user = UserService::getUserDataByEmail($email);
-        dd($user);
+
+        $fieldset = $request->validate([
+            'product_name' => 'required|string'
+        ]);
+
+        $check_product = MaterialService::checkMaterialProduct($user['studio_uuid'], $fieldset['product_name']);
+
+        if($check_product) {
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "replicated" => true,
+                "message" => "Produto {$fieldset['product_name']} já cadastrado",
+                "data" => $check_product
+            ]);
+        }
+
+        if(!$check_product) {
+            $reponse = MaterialService::productStore($user['studio_uuid'], $fieldset['product_name']);
+
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "message" => "Produto cadastrado com sucesso.",
+                "data" => $reponse
+            ]);
+        }
+
     }
 
     /**
