@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CostumerController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\Cors;
@@ -77,6 +78,10 @@ Route::controller(BudgetController::class)->group(function () {
     Route::get('budget-image', 'getImage');
     Route::get('budget-search/{costumer}', 'search');
     Route::delete('budget/{id}', 'destroy');
+});
+
+Route::controller(MaterialController::class)->group(function () {
+    Route::post('material', 'store');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);

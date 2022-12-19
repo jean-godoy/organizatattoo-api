@@ -2,10 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UserService;
+use App\Util\JWT\GenerateToken;
 use Illuminate\Http\Request;
 
-class MaterialCOntroller extends Controller
+class MaterialController extends Controller
 {
+
+    private $user;
+    private $studio;
+
+    public function __construct()
+    {
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +24,7 @@ class MaterialCOntroller extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -24,7 +35,29 @@ class MaterialCOntroller extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+        dd($user);
     }
 
     /**
