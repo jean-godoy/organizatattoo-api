@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\MaterialBrand;
+use App\Models\MaterialCategory;
 use App\Models\MaterialProduct;
 use App\Models\Studio;
 
@@ -97,4 +99,49 @@ class MaterialService
             throw $th;
         }
     }
+
+    public static function checkCategory($studio_uuid, $fieldset)
+    {
+        // $product = MaterialProduct::where('studio_id', $studio_uuid)
+        //     ->where('id', $fieldset['material_product_id'])->first() ?? null;
+
+        // $brand = $product->materialBrands()->where('id', $fieldset['brand_id'])->first();
+
+        // $check = $brand->materialCatetgories()->where ;
+
+        $brand = MaterialCategory::where('material_brand_id', $fieldset['brand_id'])
+            ->where('material_category', $fieldset['material_category'])
+            ->first() ?? null;
+
+        return $brand;
+    }
+
+    public static function categoryStore($fieldset)
+    {
+        try {
+            $brand = MaterialBrand::where('material_product_id', $fieldset['material_product_id'])
+                ->where('id', $fieldset['brand_id'])->first() ?? null;
+            $brand->materialCatetgories()->create([
+                'id' => md5(uniqid(rand() . "", true)),
+                'material_category' => $fieldset['material_category']
+            ]);
+
+            return $brand;
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function getCategoryByBrandId($brand_id)
+    {
+        try {
+            $brand = MaterialBrand::where('id', $brand_id)->first() ?? null;
+            $category = $brand->materialCatetgories()->get(['id', 'material_category'])->toArray() ?? null;
+            return $category;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
 }

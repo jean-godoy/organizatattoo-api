@@ -250,7 +250,7 @@ class MaterialController extends Controller
 
         $reponse = MaterialService::brandStore($user['studio_uuid'], $fieldset);
 
-        if($reponse) {
+        if ($reponse) {
             return response()->json([
                 "status" => true,
                 "code" => 200,
@@ -265,6 +265,123 @@ class MaterialController extends Controller
             "message" => "Erro ao registrar marca, tente novamente mais tarde.",
             "data" => []
         ]);
+    }
 
+    public function addCategory(Request $request)
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $fieldset = $request->validate([
+            'material_product_id' => 'required|string',
+            'brand_id' => 'required|string',
+            'material_category' => 'required|string'
+        ]);
+
+        $check_category = MaterialService::checkCategory($user['studio_uuid'], $fieldset);
+
+        if($check_category) {
+            return response()->json([
+                "status" => false,
+                "code" => 200,
+                "replicated" => true,
+                "message" => "Marca {$fieldset['material_category']} já cadastrada.",
+                "data" => $check_category
+            ]);
+        }
+
+        if(!$check_category){
+            $reponse = MaterialService::categoryStore($fieldset);
+
+            if($reponse) {
+                return response()->json([
+                    "status" => true,
+                    "code" => 200,
+                    "message" => "Categoria salva com sucesso.",
+                    "data" => $reponse
+                ]);
+            }
+
+            return response()->json([
+                "status" => false,
+                "code" => 200,
+                "message" => "Ocorreu algum erro para salvar categoria",
+                "data" => []
+            ]);
+        }
+
+    }
+
+    public function getCategoryByBrandId($id)
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        if(!$id) {
+            return response()->json([
+                "status" => false,
+                "code" => 500,
+                "message" => "Parametro obrigatório, ID",
+                "data" => []
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $categories = MaterialService::getCategoryByBrandId($id);
+
+        if($categories) {
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "message" => "Lista de categorias",
+                "data" => $categories
+            ]);
+        }
+
+        return response()->json([
+            "status" => false,
+            "code" => 200,
+            "message" => "Nenhuma categoria registrada.",
+            "data" => []
+        ]);
     }
 }

@@ -85,6 +85,8 @@ Route::controller(MaterialController::class)->group(function () {
     Route::post('material', 'addProduct');
     Route::get('get-brand-by-product-id/{id}', 'getBrandByProductId');
     Route::post('material-brand', 'addBrand');
+    Route::post('material-category', 'addCategory');
+    Route::get('get-category-by-brand-id/{id}', 'getCategoryByBrandId');
 });
 
 Route::get('/teste', [AuthController::class, 'index']);

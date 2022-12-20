@@ -19,6 +19,6 @@ class MaterialBrand extends Model
 
     public function materialCatetgories()
     {
-        return $this->hasMany(MaterialCategory::class, 'matarial_brand_id', 'id');
+        return $this->hasMany(MaterialCategory::class, 'material_brand_id', 'id');
     }
 }
