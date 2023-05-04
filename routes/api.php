@@ -7,6 +7,7 @@ use App\Http\Controllers\CostumerController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\Cors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,7 +44,7 @@ Route::controller(UserController::class)->group(function () {
 
 });
 
-Route::controller(CostumerController::class)->group(function () {
+Route::middleware(AuthMiddleware::class)->controller(CostumerController::class)->group(function () {
     Route::get('costumer', 'index');
     Route::patch('costumer', 'update');
     Route::post('costumer', 'store');
@@ -51,7 +52,7 @@ Route::controller(CostumerController::class)->group(function () {
 
 });
 
-Route::controller(ProfessionalController::class)->group(function () {
+Route::middleware(AuthMiddleware::class)->controller(ProfessionalController::class)->group(function () {
     Route::get('professional', 'index');
     Route::patch('professional', 'update');
     Route::post('professional', 'store');
@@ -64,7 +65,7 @@ Route::controller(ProfessionalController::class)->group(function () {
 
 });
 
-Route::controller(CategoryController::class)->group(function () {
+Route::middleware(AuthMiddleware::class)->controller(CategoryController::class)->group(function () {
     Route::get('category', 'index');
     Route::get('check-category/{category}', 'checkCategory');
     Route::post('category', 'store');
@@ -72,7 +73,7 @@ Route::controller(CategoryController::class)->group(function () {
     Route::get('sub-category/{id}', 'getSubCategory');
 });
 
-Route::controller(BudgetController::class)->group(function () {
+Route::middleware(AuthMiddleware::class)->controller(BudgetController::class)->group(function () {
     Route::post('budget', 'store');
     Route::get('budget', 'index');
     Route::get('budget-image', 'getImage');
@@ -80,13 +81,15 @@ Route::controller(BudgetController::class)->group(function () {
     Route::delete('budget/{id}', 'destroy');
 });
 
-Route::controller(MaterialController::class)->group(function () {
+Route::middleware(AuthMiddleware::class)->controller(MaterialController::class)->group(function () {
     Route::get('material-products', 'getAllProducts');
     Route::post('material', 'addProduct');
-    Route::get('get-brand-by-product-id/{id}', 'getBrandByProductId');
+    Route::get('get-brand-by-category-id/{id}', 'getBrandByCategoryId');
+    Route::get('get-brand-by-category-id-show/{category_id}/{brand_id}', 'getBrandByCategoryIdShow');
     Route::post('material-brand', 'addBrand');
     Route::post('material-category', 'addCategory');
-    Route::get('get-category-by-brand-id/{id}', 'getCategoryByBrandId');
+    Route::get('get-category-by-product-id/{id}', 'getCategoryByProductId');
+
 });
 
-Route::get('/teste', [AuthController::class, 'index']);
+Route::middleware(AuthMiddleware::class)->get('/teste', [AuthController::class, 'index']);

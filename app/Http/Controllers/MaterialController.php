@@ -162,7 +162,7 @@ class MaterialController extends Controller
         //
     }
 
-    public function getBrandByProductId($id)
+    public function getBrandByCategoryId($id)
     {
         $token = request()->bearerToken();
 
@@ -187,13 +187,57 @@ class MaterialController extends Controller
         $email = UserService::getUserEmailByToken($token);
         $user = UserService::getUserDataByEmail($email);
 
-        $reponse = MaterialService::getBrandByProductId($user['studio_uuid'], $id);
+        $reponse = MaterialService::getBrandByCategoryId($user['studio_uuid'], $id);
 
         if ($reponse) {
             return response()->json([
                 "status" => true,
                 "code" => 200,
-                "message" => "Lista das marcas relacionadas ao produto.",
+                "message" => "Lista das marcas relacionadas a categoria.",
+                "data" => $reponse
+            ]);
+        }
+
+        return response()->json([
+            "status" => false,
+            "code" => 200,
+            "message" => "Nenhuma marca registrada.",
+            "data" => []
+        ]);
+    }
+
+    public function getBrandByCategoryIdShow($category_id, $brand_id)
+    {
+        $token = request()->bearerToken();
+
+        $is_valid = GenerateToken::checkAuth($token);
+
+        if (!$is_valid) {
+            return response()->json([
+                "status" => false,
+                "message" => "Token expirado, Por favor faça login novamente!",
+                "data" => null
+            ]);
+        }
+
+        if (!$token) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Necessário chave autenticada, faça login!',
+                'data' => null
+            ]);
+        }
+
+        $email = UserService::getUserEmailByToken($token);
+        $user = UserService::getUserDataByEmail($email);
+
+        $reponse = MaterialService::getBrandByCategoryIdShow($user['studio_uuid'], $category_id, $brand_id);
+
+        if ($reponse) {
+            return response()->json([
+                "status" => true,
+                "code" => 200,
+                "message" => "Detalhes relacionado ao prodtudo.",
                 "data" => $reponse
             ]);
         }
@@ -233,10 +277,18 @@ class MaterialController extends Controller
 
         $fieldset = $request->validate([
             'product_id' => 'required|string',
+            'product_name' => 'required|string',
+            'category_id' => 'required|string',
+            'category_name' => 'required|string',
             'product_brand' => 'required|string',
+            'product_measure' => 'required|string',
+            'minimum_amount' => 'required|numeric',
+            'descartable' => 'required|boolean',
+            'sterilizable' => 'required|boolean',
         ]);
 
-        $check_brand = MaterialService::checkBrand($user['studio_uuid'], $fieldset['product_brand']);
+
+        $check_brand = MaterialService::checkBrand($fieldset['product_id'], $fieldset['category_id'], $fieldset['product_brand']);
 
         if ($check_brand) {
             return response()->json([
@@ -294,15 +346,14 @@ class MaterialController extends Controller
 
         $fieldset = $request->validate([
             'material_product_id' => 'required|string',
-            'brand_id' => 'required|string',
             'material_category' => 'required|string'
         ]);
 
         $check_category = MaterialService::checkCategory($user['studio_uuid'], $fieldset);
 
-        if($check_category) {
+        if ($check_category) {
             return response()->json([
-                "status" => false,
+                "status" => true,
                 "code" => 200,
                 "replicated" => true,
                 "message" => "Marca {$fieldset['material_category']} já cadastrada.",
@@ -310,10 +361,10 @@ class MaterialController extends Controller
             ]);
         }
 
-        if(!$check_category){
-            $reponse = MaterialService::categoryStore($fieldset);
+        if (!$check_category) {
+            $reponse = MaterialService::categoryStore($user['studio_uuid'], $fieldset);
 
-            if($reponse) {
+            if ($reponse) {
                 return response()->json([
                     "status" => true,
                     "code" => 200,
@@ -329,10 +380,9 @@ class MaterialController extends Controller
                 "data" => []
             ]);
         }
-
     }
 
-    public function getCategoryByBrandId($id)
+    public function getCategoryByProductId($id)
     {
         $token = request()->bearerToken();
 
@@ -354,7 +404,7 @@ class MaterialController extends Controller
             ]);
         }
 
-        if(!$id) {
+        if (!$id) {
             return response()->json([
                 "status" => false,
                 "code" => 500,
@@ -366,9 +416,9 @@ class MaterialController extends Controller
         $email = UserService::getUserEmailByToken($token);
         $user = UserService::getUserDataByEmail($email);
 
-        $categories = MaterialService::getCategoryByBrandId($id);
+        $categories = MaterialService::getCategoryByProductId($id);
 
-        if($categories) {
+        if ($categories) {
             return response()->json([
                 "status" => true,
                 "code" => 200,
@@ -377,11 +427,13 @@ class MaterialController extends Controller
             ]);
         }
 
-        return response()->json([
-            "status" => false,
-            "code" => 200,
-            "message" => "Nenhuma categoria registrada.",
-            "data" => []
-        ]);
+        if (!$categories) {
+            return response()->json([
+                "status" => false,
+                "code" => 200,
+                "message" => "Nenhuma categoria registrada.",
+                "data" => []
+            ]);
+        }
     }
 }

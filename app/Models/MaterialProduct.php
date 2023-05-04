@@ -17,8 +17,8 @@ class MaterialProduct extends Model
         'studio_id'
     ];
 
-    public function materialBrands()
+    public function materialCategories()
     {
-        return $this->hasMany(MaterialBrand::class, 'material_product_id', 'id');
+        return $this->hasMany(MaterialCategory::class, 'material_product_id', 'id');
     }
 }

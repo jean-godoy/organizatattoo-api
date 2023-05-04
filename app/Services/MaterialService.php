@@ -54,12 +54,14 @@ class MaterialService
         }
     }
 
-    public static function getBrandByProductId($studio_uuid, $product_id)
+    /**
+     * Retorna os produtos relacionados pela categoria.
+     */
+    public static function getBrandBycategoryId($studio_uuid, $category_id)
     {
         try {
-            $product = MaterialProduct::where('studio_id', $studio_uuid)
-                ->where('id', $product_id)->first() ?? null;
-            $brands = $product->materialBrands()->get()->toArray() ?? null;
+            $category = MaterialCategory::where('id', $category_id)->first() ?? null;
+            $brands = $category->materialBrands()->get(['id', 'product_brand'])->toArray() ?? null;
 
             return $brands;
         } catch (\Throwable $th) {
@@ -67,11 +69,30 @@ class MaterialService
         }
     }
 
-    public static function checkBrand($studio_uuid, $brand)
+    /**
+     * Método que retorna dotod os detalhes do produto,
+     * relácionado a categoria e marca
+     */
+    public static function getBrandByCategoryIdShow($studio_uuid, $category_id, $brand_id)
     {
         try {
-            $product = MaterialProduct::where('studio_id', $studio_uuid)->first();
-            $response = $product->materialBrands->where('product_brand', $brand)->first() ?? null;
+            $category = MaterialCategory::where('id', $category_id)->first() ?? null;
+            $brands = $category->materialBrands()->where('id', $brand_id)->first()->toArray() ?? null;
+
+            return $brands;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function checkBrand($product_id, $category_id, $brand)
+    {
+        try {
+            // $product = MaterialProduct::where('id', $product_id)->first();
+
+            // $category = $product->materialCategories()->where('id', $category_id)->first() ?? null;
+            $category = MaterialCategory::where('id', $category_id)->first() ?? null;
+            $response = $category->materialBrands()->where('product_brand', $brand)->first() ?? null;
 
             if ($response) {
                 return $response->product_brand;
@@ -86,15 +107,21 @@ class MaterialService
     public static function brandStore($studio_uuid, $fieldset)
     {
         try {
-            $product = MaterialProduct::where('studio_id', $studio_uuid)
-                ->where('id', $fieldset['product_id'])->first() ?? null;
+            $category = MaterialCategory::where('id', $fieldset['category_id'])->first() ?? null;
 
-            $product->materialBrands()->create([
+            $category->materialBrands()->create([
                 'id' => md5(uniqid(rand() . "", true)),
-                'product_brand' => $fieldset['product_brand']
+                'product_id' => $fieldset['product_id'],
+                'product_name' => $fieldset['product_name'],
+                'category_name' => $fieldset['category_name'],
+                'product_brand' => $fieldset['product_brand'],
+                'product_measure' => $fieldset['product_measure'],
+                'minimum_amount' => $fieldset['minimum_amount'],
+                'descartable' => $fieldset['descartable'],
+                'sterilizable' => $fieldset['sterilizable'],
             ]);
 
-            return $product;
+            return $category;
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -102,46 +129,47 @@ class MaterialService
 
     public static function checkCategory($studio_uuid, $fieldset)
     {
-        // $product = MaterialProduct::where('studio_id', $studio_uuid)
-        //     ->where('id', $fieldset['material_product_id'])->first() ?? null;
-
-        // $brand = $product->materialBrands()->where('id', $fieldset['brand_id'])->first();
-
-        // $check = $brand->materialCatetgories()->where ;
-
-        $brand = MaterialCategory::where('material_brand_id', $fieldset['brand_id'])
-            ->where('material_category', $fieldset['material_category'])
-            ->first() ?? null;
-
-        return $brand;
-    }
-
-    public static function categoryStore($fieldset)
-    {
         try {
-            $brand = MaterialBrand::where('material_product_id', $fieldset['material_product_id'])
-                ->where('id', $fieldset['brand_id'])->first() ?? null;
-            $brand->materialCatetgories()->create([
-                'id' => md5(uniqid(rand() . "", true)),
-                'material_category' => $fieldset['material_category']
-            ]);
+            $product = MaterialProduct::where('studio_id', $studio_uuid)
+                ->where('id', $fieldset['material_product_id'])->first() ?? null;
 
-            return $brand;
+            $category = $product->materialCategories()->where('material_category', $fieldset['material_category'])->first() ?? null;
 
-        } catch (\Throwable $th) {
-            throw $th;
-        }
-    }
-
-    public static function getCategoryByBrandId($brand_id)
-    {
-        try {
-            $brand = MaterialBrand::where('id', $brand_id)->first() ?? null;
-            $category = $brand->materialCatetgories()->get(['id', 'material_category'])->toArray() ?? null;
             return $category;
         } catch (\Throwable $th) {
             throw $th;
         }
     }
 
+    public static function categoryStore($studio_uuid, $fieldset)
+    {
+        try {
+            $product = MaterialProduct::where('studio_id', $studio_uuid)
+                ->where('id', $fieldset['material_product_id'])->first() ?? null;
+
+            $product->materialCategories()->create([
+                'id' => md5(uniqid(rand() . "", true)),
+                'material_category' => $fieldset['material_category']
+            ]);
+            return $product;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public static function getCategoryByProductId($product_id)
+    {
+        try {
+            $product = MaterialProduct::where('id', $product_id)->first() ?? null;
+            $category = $product->materialCategories()->get(['id', 'material_category'])->toArray() ?? null;
+
+            if ($category) {
+                return $category;
+            }
+
+            return null;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

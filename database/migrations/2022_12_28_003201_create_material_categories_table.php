@@ -17,12 +17,12 @@ return new class extends Migration
         Schema::create('material_categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('material_category');
-            $table->uuid('material_brand_id');
+            $table->uuid('material_product_id');
             $table->timestamps();
 
-            $table->foreign('material_brand_id')
+            $table->foreign('material_product_id')
                 ->references('id')
-                ->on('material_brands');
+                ->on('material_products');
         });
     }
 

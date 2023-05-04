@@ -12,6 +12,7 @@ class TokenValidate
         if (!$is_valid) {
             return response()->json([
                 "status" => false,
+                "code" => 401,
                 "message" => "Token expirado, Por favor faça login novamente!",
                 "data" => null
             ]);
@@ -19,9 +20,10 @@ class TokenValidate
 
         if (!$token) {
             return response()->json([
-                'status' => false,
-                'message' => 'Necessário chave autenticada, faça login!',
-                'data' => null
+                "status" => false,
+                "code" => 401,
+                "message" => "Necessário chave autenticada, faça login!",
+                "data" => null
             ]);
         }
 

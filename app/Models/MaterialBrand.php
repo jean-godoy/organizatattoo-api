@@ -14,11 +14,12 @@ class MaterialBrand extends Model
     protected $fillable = [
         'id',
         'product_brand',
-        'material_product_id'
+        'product_measure',
+        'minimum_amount',
+        'descartable',
+        'sterilizable',
+        'total_amount',
+        'is_active',
+        'material_category_id'
     ];
-
-    public function materialCatetgories()
-    {
-        return $this->hasMany(MaterialCategory::class, 'material_brand_id', 'id');
-    }
 }

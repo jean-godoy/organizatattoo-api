@@ -21,7 +21,7 @@ class GenerateToken
         $jwt = new JwtService();
         $user = $jwt->getUserData($email, $pass);
 
-        if(!$user['status']) {
+        if (!$user['status']) {
             return [
                 "status" => false,
                 "code" => $user['code'],
@@ -89,11 +89,7 @@ class GenerateToken
 
         if (isset($token) && $token != null) {
             $current_date = date('Y-m-d H:i:s');
-            // $bearer = explode(' ', $token);
-            //$bearer[0] = 'bearer';
-            //$bearer[1] = 'token jwt';
 
-            // $token = explode('.', $bearer[1]);
             $token = explode('.', $token);
             $header = $token[0];
             $payload = $token[1];
@@ -129,19 +125,32 @@ class GenerateToken
 
             //First IF, verify token is valid.
             if ($sign === $valid) {
-                $is_valid = false;
+                $is_valid = true;
             }
-            //Check if the token has expired.
-            if($diference >= 5000) {
+            //Check if the token has expired. 60 minutes
+            if ($diference >= 60) {
                 $is_expired = true;
-
             }
-            // dd($diference);
-            if ($is_valid || $is_expired) {
-                return false;
+            // dd($is_expired);
+            if ($is_valid) {
+                if (!$is_expired) {
+                    return [
+                        "status" => true,
+                        "code" =>  200,
+                        "message" => "token is valid",
+                        "data" => null
+                    ];
+                }
+
+                return [
+                    "status" => false,
+                    "code" => 401,
+                    "message" => "token expired",
+                    "data" => null
+                ];
             }
 
-            return true;
+            return false;
         }
     }
 
@@ -173,7 +182,8 @@ class GenerateToken
     }
 
     private static function getStudio()
-    {   $studio = new Studio;
+    {
+        $studio = new Studio;
         return $studio;
     }
 }

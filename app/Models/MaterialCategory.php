@@ -14,6 +14,11 @@ class MaterialCategory extends Model
     protected $fillable = [
         'id',
         'material_category',
-        'material_brand_id'
+        'material_product_id'
     ];
+
+    public function materialBrands()
+    {
+        return $this->hasMany(MaterialBrand::class, 'material_category_id', 'id');
+    }
 }
